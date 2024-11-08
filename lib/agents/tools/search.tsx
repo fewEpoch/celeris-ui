@@ -15,7 +15,7 @@ import {
 
 export const searchTool = ({ uiStream, fullResponse }: ToolProps) =>
   tool({
-    description: 'Search the web for information',
+    description: 'Search the web or internal docs for information',
     parameters: searchSchema,
     execute: async ({
       query,
@@ -39,7 +39,7 @@ export const searchTool = ({ uiStream, fullResponse }: ToolProps) =>
         query.length < 5 ? query + ' '.repeat(5 - query.length) : query
       let searchResult: SearchResults
       const searchAPI =
-        (process.env.SEARCH_API as 'tavily' | 'exa' | 'searxng') || 'tavily'
+        (process.env.SEARCH_API as 'tavily' | 'exa' | 'searxng') || 'celerisSearch'
 
       const effectiveSearchDepth =
         searchAPI === 'searxng' &&
@@ -73,12 +73,22 @@ export const searchTool = ({ uiStream, fullResponse }: ToolProps) =>
             )
           }
           searchResult = await response.json()
+        } else if (searchAPI === 'celerisSearch') {
+          // API route for advanced SearXNG search
+          celerisSearch(
+            filledQuery,
+            max_results,
+            effectiveSearchDepth === 'advanced' ? 'advanced' : 'basic',
+            include_domains,
+            exclude_domains
+          )
         } else {
           searchResult = await (searchAPI === 'tavily'
             ? tavilySearch
             : searchAPI === 'exa'
             ? exaSearch
-            : searxngSearch)(
+            : searxngSearch
+            )(
             filledQuery,
             max_results,
             effectiveSearchDepth === 'advanced' ? 'advanced' : 'basic',
@@ -108,6 +118,52 @@ export const searchTool = ({ uiStream, fullResponse }: ToolProps) =>
       return searchResult
     }
   })
+
+async function celerisSearch(
+  query: string,
+  maxResults: number = 10,
+  searchDepth: 'basic' | 'advanced' = 'basic',
+  includeDomains: string[] = [],
+  excludeDomains: string[] = []
+): Promise<SearchResults> {
+
+  const includeImageDescriptions = true
+  console.log(`Query is ${query}`)
+  const response = await fetch(`https://ramisra--celeris-yc-fastapi-app.modal.run/search?query=${query}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  console.log("Calling Celeris Doc Search API")
+  if (!response.ok) {
+    throw new Error(
+      `Celeris API error: ${response.status} ${response.statusText}`
+    )
+  }
+
+  const data = await response.json()
+//   const processedImages = includeImageDescriptions
+//     ? data.images
+//         .map(({ url, description }: { url: string; description: string }) => ({
+//           url: sanitizeUrl(url),
+//           description
+//         }))
+//         .filter(
+//           (
+//             image: SearchResultImage
+//           ): image is { url: string; description: string } =>
+//             typeof image === 'object' &&
+//             image.description !== undefined &&
+//             image.description !== ''
+//         )
+//     : data.images.map((url: string) => sanitizeUrl(url))
+
+  return {
+    ...data
+  }
+}
+
 
 async function tavilySearch(
   query: string,

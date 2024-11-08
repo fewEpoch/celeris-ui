@@ -9,6 +9,7 @@ export interface ToolProps {
 }
 
 export const getTools = ({ uiStream, fullResponse }: ToolProps) => {
+  console.log("Selecting tools ....")
   const tools: any = {
     search: searchTool({
       uiStream,

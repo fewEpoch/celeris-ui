@@ -55,6 +55,12 @@ export const models: Model[] = [
     providerId: 'azure'
   },
   {
+    id: 'llama-3.2-90b-vision-preview',
+    name: 'Llama-3.2-90b-Vision',
+    provider: 'Groq',
+    providerId: 'groq'
+  },
+  {
     id: process.env.NEXT_PUBLIC_OPENAI_COMPATIBLE_MODEL || 'undefined',
     name: process.env.NEXT_PUBLIC_OPENAI_COMPATIBLE_MODEL || 'Undefined',
     provider: 'OpenAI Compatible',

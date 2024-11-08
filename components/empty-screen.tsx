@@ -3,20 +3,8 @@ import { ArrowRight } from 'lucide-react'
 
 const exampleMessages = [
   {
-    heading: 'What is OpenAI o1?',
-    message: 'What is OpenAI o1?'
-  },
-  {
-    heading: 'Why is Nvidia growing rapidly?',
-    message: 'Why is Nvidia growing rapidly?'
-  },
-  {
-    heading: 'Tesla vs Rivian',
-    message: 'Tesla vs Rivian'
-  },
-  {
-    heading: 'Summary: https://arxiv.org/pdf/2407.16833',
-    message: 'Summary: https://arxiv.org/pdf/2407.16833'
+    heading: 'What is the revenue of infosys across business segment?',
+    message: 'What is the revenue of infosys across business segment?'
   }
 ]
 export function EmptyScreen({
